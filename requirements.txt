@@ -1,0 +1,5 @@
+Django==1.8b2
+Pillow==2.7.0
+gunicorn==19.3.0
+psycopg2==2.6
+django-phonenumber-field==0.7.2
