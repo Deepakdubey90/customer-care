@@ -10,9 +10,9 @@ https://docs.djangoproject.com/en/1.6/ref/settings/
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 import os
-BASE_DIR = os.path.dirname(os.path.dirname(__file__))
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(__file__)))
 
-
+print(BASE_DIR)
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/1.6/howto/deployment/checklist/
@@ -24,6 +24,9 @@ SECRET_KEY = 's)nv_3vavihi@7fjap%5z#f5gve68amyo8fc093p-6!!o9j+r('
 DEBUG = True
 
 TEMPLATE_DEBUG = True
+
+TEMPLATE_DIRS = (os.path.join(BASE_DIR,'templates'),)
+
 
 ALLOWED_HOSTS = []
 
@@ -94,8 +97,15 @@ TIME_ZONE = 'Asia/Kolkata'
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.6/howto/static-files/
+STATIC_PATH = os.path.join(BASE_DIR,'static')
 
 STATIC_URL = '/static/'
+
+#STATIC_DEBUG = True
+
+STATICFILES_DIRS = (
+    STATIC_PATH,
+)
 
 try:
     from local import *
