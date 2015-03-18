@@ -1,15 +1,17 @@
 from django.conf.urls import patterns, include, url
 from django.conf import settings
+from office.views import OfficeSearchView
 from django.contrib import admin
 from django.contrib.staticfiles import views
 from views import IndexView
+
 
 
 urlpatterns = patterns('',
     # Examples:
     # url(r'^$', 'customrcare.views.home', name='home'),
     # url(r'^blog/', include('blog.urls')),
-
+    url(r'^office/search', OfficeSearchView.as_view()),
     url(r'^admin/', include(admin.site.urls)),
     url(r'^$', IndexView.as_view(template_name = 'customrcare/index.html')),
     url(r'^static/css/bootstrap.min.css', 'django.views.static.serve',
