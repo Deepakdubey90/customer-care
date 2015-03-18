@@ -1,5 +1,4 @@
 import json
-from django.http import JsonResponse
 from django.template import Context, loader
 from django.http import HttpResponse
 from django.http import HttpResponseRedirect
@@ -11,38 +10,39 @@ from organization.models import Organization
 from state.models import State
 from office.models import Office
 from country.models import Country
-from .forms import OfficeDetailsForm
+from .forms import OfficeSearchForm
 from city.models import City
 from django import forms
 
 
 class OfficeSearchView(ListView):
 
-    def get(self, request, *args, **Kwargs):
+    def get(self, request, *args):
+        """  search offices with given organization and city name """
 
-        response_data ={}
-        print("request data is", dir(request))
-        print("\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\")
-        search = request.GET.get('q')
+        organization = request.GET.get('org')
         city = request.GET.get('city')
-        q = Q()
-        page = 1
-        page_size =10
-        if search:
-            q =  q & Q(organization__name__icontains=search)
-            print("called in if condition@@@@@@@@@@@@@@@@@")
-            office_info = Office.objects.filter(q, city__name__icontains=city)
-            print("value of q is", office_info)
-            print("get fn called!!!!!!!!!!")
-            #form = OfficeDetailsForm()
-            paginator = Paginator(office_info, page_size)
-            try:
-                office_search  = paginator.page(page)
-            except PageNotAnInteger:
-                office_search = paginator.page(1)
-            except EmptyPage:
-                office_search = paginator.page(paginator.num_pages)
+        page = request.GET.get('page')
+        page_size = request.GET.get('page_size')
+        officeForm =  OfficeSearchForm(request.GET)
+        page_number = page if page else 1
+        page_size = page_size if page_size else 10
 
-        response_data['result'] = office_search
-        print('contact details::', office_search)
-        return HttpResponse(json.dumps(response_data), mimetype='application/json')
+        if officeForm.is_valid():
+            q = Q()
+            q =  q & Q(organization__name__icontains=organization)
+            search_result = Office.objects.filter(q, city__name__icontains=city, deleted_on=None).values('name', 'description', 'line1', 'line2', 'zipcode')
+            paginator = Paginator(search_result, page_size)
+            try:
+                current_page  = paginator.page(page_number)
+            except PageNotAnInteger:
+                page_number = 1
+                current_page = paginator.page(page_number)
+            except EmptyPage:
+                page_number = paginator.num_pages
+                current_page = paginator.page(page_number)
+            response_data = { "results":list(current_page.object_list), "page_number": page_number, "total_pages":paginator.num_pages}
+            return HttpResponse(json.dumps(response_data), content_type='application/json')
+        else:
+            response_data = {"error":officeForm.errors}
+            return HttpResponse(json.dumps(response_data), content_type='application/json')

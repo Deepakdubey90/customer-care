@@ -12,5 +12,5 @@ class Office(BaseModel):
     line1 = models.CharField(max_length = 200, null = False)
     line2 = models.CharField(max_length = 200, null = True, blank = True)
     zipcode = models.CharField(max_length =10, null = True, blank = True)
-    def __str__(self):
-        return self.name
+    #def __str__(self):
+    #   return self.name
