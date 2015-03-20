@@ -1,4 +1,5 @@
 import json
+from django.db import models
 from django.template import Context, loader
 from django.http import HttpResponse
 from django.http import HttpResponseRedirect
@@ -31,7 +32,15 @@ class OfficeSearchView(ListView):
         if officeForm.is_valid():
             q = Q()
             q =  q & Q(organization__name__icontains=organization)
-            search_result = Office.objects.filter(q, city__name__icontains=city, deleted_on=None).values('name', 'description', 'line1', 'line2', 'zipcode')
+            search_result = Office.objects.filter(q, city__name__icontains=city, deleted_on=None).values('name', 'description', 'line1', 'line2', 'zipcode', 'organization__name', 'city__name', 'city__state__name', 'city__state__country__name')
+
+            search_result = [{'zipcode': tmp['zipcode'], 'city': tmp['city__name'],
+                              'organization': tmp['organization__name'], 'address1': tmp['line1'],
+                              'address2': tmp['line2'], 'officeName': tmp['name'],
+                              'state': tmp['city__state__name'],
+                              'country': tmp['city__state__country__name'],
+                              'description': tmp['description']} for tmp in search_result]
+
             paginator = Paginator(search_result, page_size)
             try:
                 current_page  = paginator.page(page_number)
