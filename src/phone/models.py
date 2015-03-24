@@ -10,6 +10,7 @@ from django.core.validators import RegexValidator
 class Phone(BaseModel):
 
     phone =  PhoneNumberField()
+    contact_type = models.CharField(max_length = 20, null = False)
     entity_object_id = models.UUIDField(default=uuid.uuid4, editable=False)
     entity_content_type = models.ForeignKey(ContentType)
     entity_object = GenericForeignKey('entity_content_type',
