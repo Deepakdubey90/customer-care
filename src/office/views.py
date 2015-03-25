@@ -12,10 +12,13 @@ from state.models import State
 from office.models import Office
 from country.models import Country
 from phone.models import Phone
+from mail.models import Email
 from .forms import OfficeSearchForm
 from city.models import City
 from django import forms
 from utils.utility import get_content_type
+from utils.utility import get_result_with_contacts_and_emails
+
 
 
 class OfficeSearchView(ListView):
@@ -41,16 +44,26 @@ class OfficeSearchView(ListView):
                                                                           'line2', 'zipcode',
                                                                           'organization__name',
                                                                           'city__state__name',
-                                                                          'city__state__country__name')
+                                                                          'city__state__country__name',
+                                                                          'city__state__country__id',
+                                                                          'organization__id')
 
-            query_office = Office.objects.filter(q, city__name__icontains=city, deleted_on=None)
-            office_id_list = [t.id for t in query_office]
-            contact_details = Phone.objects.filter(entity_object_id__in = office_id_list, entity_content_type_id=content_type).values('phone', 'contact_type', 'entity_object_id');
+            office_details = Office.objects.filter(q, city__name__icontains=city, deleted_on=None)
+            office_id_list = [t.id for t in office_details]
+            office_contacts = Phone.objects.filter(entity_object_id__in = office_id_list, entity_content_type_id=content_type).values('phone', 'contact_type', 'entity_object_id');
+            organazation_id_list = office_details.values('organization__id')
+            country_id_list = office_details.values('city__state__country__id')
+            mail_details = Email.objects.filter(organization_id__in = organazation_id_list, country_id__in = country_id_list).values('email', 'description', 'organization_id', 'country_id')
 
-            contact_details = [{'phone': ct['phone'], 'contact_type': ct['contact_type'],
-                                'entity_object_id': str(ct['entity_object_id'])} for ct in contact_details]
+            mail_details = [{'email': mail['email'], 'description': mail['description'],
+                             'organization_id': str(mail['organization_id']), 'country_id': str(mail['country_id'])} for mail in mail_details]
+
+            office_contacts = [{'phone': ct['phone'], 'contact_type': ct['contact_type'],
+                                'entity_object_id': str(ct['entity_object_id'])} for ct in office_contacts]
+
             search_result = [{'zipcode': tmp['zipcode'], 'city': tmp['city__name'],
-                              'id': str(tmp['id']),
+                              'id': str(tmp['id']), 'organization_id': str(tmp['organization__id']),
+                              'country_id': str(tmp['city__state__country__id']),
                               'organization': tmp['organization__name'],
                               'address1': tmp['line1'],
                               'address2': tmp['line2'], 'officeName': tmp['name'],
@@ -58,15 +71,7 @@ class OfficeSearchView(ListView):
                               'country': tmp['city__state__country__name'],
                               'description': tmp['description']} for tmp in search_result]
 
-            for office in search_result:
-                for phone in contact_details:
-                    if office['id'] == phone['entity_object_id']:
-                        if 'contacts' in office:
-                            office['contacts'].append(phone.copy())
-                        else:
-                            office['contacts'] = [phone]
-
-
+            get_result_with_contacts_and_emails(search_result, office_contacts, mail_details)
             paginator = Paginator(search_result, page_size)
             try:
                 current_page  = paginator.page(page_number)
