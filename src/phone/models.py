@@ -14,4 +14,6 @@ class Phone(BaseModel):
     entity_object_id = models.UUIDField(default=uuid.uuid4, editable=False)
     entity_content_type = models.ForeignKey(ContentType)
     entity_object = GenericForeignKey('entity_content_type',
-                                              'entity_object_id')
+                                      'entity_object_id')
+    def __str__(self):
+        return "%s %s" %(self.phone, self.contact_type)
