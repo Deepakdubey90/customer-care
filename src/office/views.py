@@ -11,9 +11,11 @@ from organization.models import Organization
 from state.models import State
 from office.models import Office
 from country.models import Country
+from phone.models import Phone
 from .forms import OfficeSearchForm
 from city.models import City
 from django import forms
+from utils.utility import get_content_type
 
 
 class OfficeSearchView(ListView):
@@ -28,18 +30,42 @@ class OfficeSearchView(ListView):
         officeForm =  OfficeSearchForm(request.GET)
         page_number = page if page else 1
         page_size = page_size if page_size else 10
+        content_type = get_content_type('office', 'office').id
 
         if officeForm.is_valid():
             q = Q()
             q =  q & Q(organization__name__icontains=organization)
-            search_result = Office.objects.filter(q, city__name__icontains=city, deleted_on=None).values('name', 'description', 'line1', 'line2', 'zipcode', 'organization__name', 'city__name', 'city__state__name', 'city__state__country__name')
+            search_result = Office.objects.filter(q, city__name__icontains=city,
+                                                  deleted_on=None).values('id' ,'name', 'city__name',
+                                                                          'description', 'line1',
+                                                                          'line2', 'zipcode',
+                                                                          'organization__name',
+                                                                          'city__state__name',
+                                                                          'city__state__country__name')
 
+            query_office = Office.objects.filter(q, city__name__icontains=city, deleted_on=None)
+            office_id_list = [t.id for t in query_office]
+            contact_details = Phone.objects.filter(entity_object_id__in = office_id_list, entity_content_type_id=content_type).values('phone', 'contact_type', 'entity_object_id');
+
+            contact_details = [{'phone': ct['phone'], 'contact_type': ct['contact_type'],
+                                'entity_object_id': str(ct['entity_object_id'])} for ct in contact_details]
             search_result = [{'zipcode': tmp['zipcode'], 'city': tmp['city__name'],
-                              'organization': tmp['organization__name'], 'address1': tmp['line1'],
+                              'id': str(tmp['id']),
+                              'organization': tmp['organization__name'],
+                              'address1': tmp['line1'],
                               'address2': tmp['line2'], 'officeName': tmp['name'],
                               'state': tmp['city__state__name'],
                               'country': tmp['city__state__country__name'],
                               'description': tmp['description']} for tmp in search_result]
+
+            for office in search_result:
+                for phone in contact_details:
+                    if office['id'] == phone['entity_object_id']:
+                        if 'contacts' in office:
+                            office['contacts'].append(phone.copy())
+                        else:
+                            office['contacts'] = [phone]
+
 
             paginator = Paginator(search_result, page_size)
             try:
