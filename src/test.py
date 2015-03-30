@@ -41,13 +41,14 @@ for links in redditAll:
     print("HCL Contact Number:",links.text)
 
 """
-
 print("called in test file!!!!!!!!!!!!!!!")
 redditFile = urlopen("https://www.sony.co.in/section/contactus")
 redditHtml = redditFile.read()
 redditFile.close()
 soup = BeautifulSoup(redditHtml)
-'''redditAll = soup.find_all("div", class_="right contactUsRightCol BodyText")'''
-redditAll = soup.select("#CategoryLanding > div.right.contactUsRightCol > div:nth-child(1) > p:nth-child(4)")
+redditAll = soup.find_all("div", class_="right contactUsRightCol BodyText")
+m = []
 for links in redditAll:
-    print("Sony Contact Number:",links.text)
+    print("str value is ", links.text)
+    m = re.search('([0-9]{3,4}-[0-9]{3,4}-[0-9]{3,4})', links.text)
+    print("Sony Contact Number:", m)

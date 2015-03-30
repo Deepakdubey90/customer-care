@@ -21,4 +21,4 @@ class Phone(BaseModel):
     organization = models.ForeignKey(Organization)
 
     def __str__(self):
-        return "%s %s" %(self.phone, self.contact_type)
+        return "%s" %(self.phone)
