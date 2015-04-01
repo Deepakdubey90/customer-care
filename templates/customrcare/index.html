@@ -14,39 +14,39 @@
     <div class="search-box">
       <h1 class="logo">CustomrCare</h1>
       <div class="row search-space">
-	<div class="col-sm-8">
-	  <input type="text" class="form-control search-text" id="search-b" placeholder="Search"/>
-	  <span id="error-line" style="display:none"></span>
-	</div>
-	<div class="col-sm-2">
-	  <select class="form-control search-text" id="city-search">
-	    {% for city in cities %}
-	    <option class="form-control">{{city.name}}</option>
-	    {% endfor %}
-	  </select>
-	</div>
-	<div class="col-sm-2">
-	  <button class="btn form-control search-btn" id="search-btn"><span class="glyphicon glyphicon-search"></span></button>
-	</div>
+        <div class="col-sm-8">
+          <input type="text" class="form-control search-text" id="search-b" placeholder="Search"/>
+          <span id="error-line" style="display:none"></span>
+        </div>
+        <div class="col-sm-2">
+          <select class="form-control search-text" id="city-search">
+            {% for city in cities %}
+            <option class="form-control">{{city.name}}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="col-sm-2">
+          <button class="btn form-control search-btn" id="search-btn"><span class="glyphicon glyphicon-search"></span></button>
+        </div>
       </div>
     </div>
     <div id="result-template" style="display:none">
-	<div class="result">
-	  <div class="office-address float-left">
-	    <h3 class="organization"></h3>
-	    <p class="office">
-	      <span class="office-description"></span>  <br>
-	      <span class="office-name"></span> <br>
-	      <span class="address-line1"></span> <br>
-	      <span class="address-line2"></span> <br>
-	      <span class="city"></span>, &nbsp;<span class="state"></span>, &nbsp;<span class="zipcode"></span><br>
-	      <span class="country"></span><br></p>
-	  </div>
-	  <div class="office-contact float-right">
-	    <div class="office-phone"></div>
-	    <div class="office-email"></div>
-	  </div>
-	</div>
+        <div class="result">
+          <div class="office-address float-left">
+            <h3 class="organization"></h3>
+            <p class="office">
+              <span class="office-description"></span>  <br>
+              <span class="office-name"></span> <br>
+              <span class="address-line1"></span> <br>
+              <span class="address-line2"></span> <br>
+              <span class="city"></span>, &nbsp;<span class="state"></span>, &nbsp;<span class="zipcode"></span><br>
+              <span class="country"></span><br></p>
+          </div>
+          <div class="office-contact float-right">
+            <div class="office-phone"></div>
+            <div class="office-email"></div>
+          </div>
+        </div>
     </div>
 
    <div class="row" id="result-box">

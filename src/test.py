@@ -50,5 +50,5 @@ redditAll = soup.find_all("div", class_="right contactUsRightCol BodyText")
 m = []
 for links in redditAll:
     print("str value is ", links.text)
-    m = re.search('([0-9]{3,4}-[0-9]{3,4}-[0-9]{3,4})', links.text)
-    print("Sony Contact Number:", m)
+    ''' m = re.search('([0-9]{3,4}-[0-9]{3,4}-[0-9]{3,4})', links.text)'''
+    ''' print("Sony Contact Number:", m)'''
